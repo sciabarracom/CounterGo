@@ -1,3 +1,5 @@
+A modified version of Counter to build as a Go OpenWhisk action
+
 # Counter
 Counter is a free, open-source chess engine, implemented in [Go](https://golang.org/).
 Counter supports standard UCI (universal chess interface) protocol.

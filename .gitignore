@@ -4,10 +4,12 @@
 *.dll
 *.so
 *.dylib
-counter/counter
 
 # Test binary, build with `go test -c`
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+chess
+chess.zip
