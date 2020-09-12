@@ -16,6 +16,7 @@ func main() {
 	}
 
 	args := make(map[string]interface{})
+	args["__ow_method"] = "post"
 	if len(os.Args) > 1 {
 		args["fen"] = os.Args[1]
 	}

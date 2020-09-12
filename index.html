@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
     <head>
         <script src="https://unpkg.com/jquery"></script>
@@ -9,38 +8,22 @@
         <link rel="icon" type="image/png" href="https://unpkg.com/chessboardjs@0.0.1/www/img/favicon.ico">
     </head>
     <body>
+        <h2 id="status"></h2>
         <div id="myBoard" style="width: 400px"></div>
-        <table>
-            <tr>
-             <th>Status:</th>
-             <td id="status">/td>
-            </tr>
-            <tr>
-               <th>PGN:</th>
-               <td id="pgn"></td>
-            </tr>
-            <tr>
-               <th>FEN:</th>
-               <td><input id="fen" type="text" size="70"><button id="update">Update</button></td>
-            </tr>
-            <tr>
-               <th>Engine<br>time:</th>
-               <td><select id="time">
-                   <option value="1000">1 second</option>
-                   <option value="2000">2 seconds</option>
-                   <option value="5000">5 seconds</option>
-                   <option value="10000">10 seconds</option>
-                   <option value="20000">20 seconds</option>
-                   <option value="60000">1 minute</option>
-                  </select>
-               </td>
-            </tr>
-        </table>
-    <script>
-// NOTE: this example uses the chess.js library:
-// https://github.com/jhlywa/chess.js
-
-var chessURL = "https://apigcp.nimbella.io/api/v1/web/msciabar-zc3thebgxgh/default/chess"
+        <input id="fen" type="text" size="60" maxlength="100">
+        <br><button id="update">Change Position</button><br>
+        <br>
+        <b>Engine Time</b>:
+        <select id="time">
+          <option value="100" >0.1 second (Dumb)</option>
+          <option value="500">0.5 second (Easy)</option>
+          <option value="1000" selected>1 second (Normal)</option>
+          <option value="2500">2.5 seconds (Hard)</option>
+        </select><br>
+        <div id="pgn"></div>
+<script>
+var chessURL = location.href
+chessURL = "https://apigcp.nimbella.io/api/v1/web/msciabar-zc3thebgxgh/default/chess" // REMOVE-ME
 
 var board = null
 var game = new Chess()
@@ -61,10 +44,15 @@ function onDragStart (source, piece, position, orientation) {
 }
 
 function engineMove() {
+    var data = { 
+      "fen": game.fen(),
+      "time": $("#time").val()
+    }
+    console.log(data)
     $.ajax({
       type: "POST",
       url: chessURL,
-      data: JSON.stringify({ "fen": game.fen(), "time": $("#time").val()}),
+      data: JSON.stringify(data),
       contentType: "application/json; charset=utf-8",
       success: function(data) {
           if("move" in data) {
@@ -76,9 +64,6 @@ function engineMove() {
             return
           }
           updateStatus()
-          if(game.game_over()) {
-             alert("Game Over")
-          }
       },
       failure: function(err) {
           console.log(err)
@@ -99,7 +84,6 @@ function onDrop (source, target) {
   if (move === null) return 'snapback'
   updateStatus()
   if(game.game_over()) {
-      alert("Game Over")
       return
   }
   engineMove()
@@ -145,12 +129,14 @@ function updateStatus () {
 }
 
 $update.click(function() {
-  if(! game.load($fen.val()) ) {
+  var fen = $fen.val()
+  if(! game.load(fen) ) {
     alert("Invalid FEN")
     game.load(board.position())
-    updateStatus()
     return
   }
+  board.position(fen)
+  updateStatus()
   if(game.turn() == 'b') {
     engineMove()
   }
@@ -165,6 +151,6 @@ var config = {
 }
 board = Chessboard('myBoard', config)
 updateStatus()
-    </script>
+</script>
     </body>
 </html>
